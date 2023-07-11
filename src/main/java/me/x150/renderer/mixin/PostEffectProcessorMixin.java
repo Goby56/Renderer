@@ -43,7 +43,7 @@ public class PostEffectProcessorMixin implements ShaderEffectDuck {
 			for (PostEffectPass pass : this.passes) {
 				// replace input and output of each pass to our new framebuffer, if they reference the one we're replacing
 				if (pass.input == previousFramebuffer) {
-					((PostEffectPassAccessor) pass).renderer_setInput(buffer);
+					((me.x150.renderer.mixin.PostEffectPassAccessor) pass).renderer_setInput(buffer);
 				}
 				if (pass.output == previousFramebuffer) {
 					((PostEffectPassAccessor) pass).renderer_setOutput(buffer);

@@ -39,7 +39,7 @@ public class RendererUtils {
 	@ApiStatus.Internal
 	public static final Matrix4f lastWorldSpaceMatrix = new Matrix4f();
 
-	private static final FastMStack empty = new FastMStack();
+	private static final me.x150.renderer.util.FastMStack empty = new FastMStack();
 	private static final MinecraftClient client = MinecraftClient.getInstance();
 	private static final char RND_START = 'a';
 	private static final char RND_END = 'z';

@@ -52,8 +52,8 @@ public class FontRenderer implements Closeable {
 	private static final int BLOCK_SIZE = 256;
 	private static final Object2ObjectArrayMap<Identifier, ObjectList<DrawEntry>> GLYPH_PAGE_CACHE = new Object2ObjectArrayMap<>();
 	private final float originalSize;
-	private final ObjectList<GlyphMap> maps = new ObjectArrayList<>();
-	private final Char2ObjectArrayMap<Glyph> allGlyphs = new Char2ObjectArrayMap<>();
+	private final ObjectList<me.x150.renderer.font.GlyphMap> maps = new ObjectArrayList<>();
+	private final Char2ObjectArrayMap<me.x150.renderer.font.Glyph> allGlyphs = new Char2ObjectArrayMap<>();
 	private int scaleMul = 0;
 	private Font[] fonts;
 	private int previousGameScale = -1;
@@ -111,24 +111,24 @@ public class FontRenderer implements Closeable {
 		}
 	}
 
-	private GlyphMap generateMap(char from, char to) {
-		GlyphMap gm = new GlyphMap(from, to, this.fonts, RendererUtils.randomIdentifier());
+	private me.x150.renderer.font.GlyphMap generateMap(char from, char to) {
+		me.x150.renderer.font.GlyphMap gm = new me.x150.renderer.font.GlyphMap(from, to, this.fonts, RendererUtils.randomIdentifier());
 		maps.add(gm);
 		return gm;
 	}
 
-	private Glyph locateGlyph0(char glyph) {
-		for (GlyphMap map : maps) { // go over existing ones
+	private me.x150.renderer.font.Glyph locateGlyph0(char glyph) {
+		for (me.x150.renderer.font.GlyphMap map : maps) { // go over existing ones
 			if (map.contains(glyph)) { // do they have it? good
 				return map.getGlyph(glyph);
 			}
 		}
 		int base = floorNearestMulN(glyph, BLOCK_SIZE); // if not, generate a new page and return the generated glyph
-		GlyphMap glyphMap = generateMap((char) base, (char) (base + BLOCK_SIZE));
+		me.x150.renderer.font.GlyphMap glyphMap = generateMap((char) base, (char) (base + BLOCK_SIZE));
 		return glyphMap.getGlyph(glyph);
 	}
 
-	private Glyph locateGlyph1(char glyph) {
+	private me.x150.renderer.font.Glyph locateGlyph1(char glyph) {
 		return allGlyphs.computeIfAbsent(glyph, this::locateGlyph0);
 	}
 
@@ -192,7 +192,7 @@ public class FontRenderer implements Closeable {
 				lineStart = i + 1;
 				continue;
 			}
-			Glyph glyph = locateGlyph1(c);
+			me.x150.renderer.font.Glyph glyph = locateGlyph1(c);
 			if (glyph.value() != ' ') { // we only need to really draw the glyph if it's not blank, otherwise we can just skip its width and that'll be it
 				Identifier i1 = glyph.owner().bindToTexture;
 				DrawEntry entry = new DrawEntry(xOffset, yOffset, r2, g2, b2, glyph);
@@ -212,8 +212,8 @@ public class FontRenderer implements Closeable {
 				float cr = object.r;
 				float cg = object.g;
 				float cb = object.b;
-				Glyph glyph = object.toDraw;
-				GlyphMap owner = glyph.owner();
+				me.x150.renderer.font.Glyph glyph = object.toDraw;
+				me.x150.renderer.font.GlyphMap owner = glyph.owner();
 				float w = glyph.width();
 				float h = glyph.height();
 				float u1 = (float) glyph.u() / owner.width;
@@ -265,7 +265,7 @@ public class FontRenderer implements Closeable {
 				currentLine = 0;
 				continue;
 			}
-			Glyph glyph = locateGlyph1(c1);
+			me.x150.renderer.font.Glyph glyph = locateGlyph1(c1);
 			currentLine += glyph.width() / (float) this.scaleMul;
 		}
 		return Math.max(currentLine, maxPreviousLines);
@@ -294,7 +294,7 @@ public class FontRenderer implements Closeable {
 				currentLine = 0;
 				continue;
 			}
-			Glyph glyph = locateGlyph1(c1);
+			me.x150.renderer.font.Glyph glyph = locateGlyph1(c1);
 			currentLine = Math.max(glyph.height() / (float) this.scaleMul, currentLine);
 		}
 		return currentLine + previous;
@@ -305,13 +305,13 @@ public class FontRenderer implements Closeable {
 	 */
 	@Override
 	public void close() {
-		for (GlyphMap map : maps) {
+		for (me.x150.renderer.font.GlyphMap map : maps) {
 			map.destroy();
 		}
 		maps.clear();
 		allGlyphs.clear();
 	}
 
-	record DrawEntry(float atX, float atY, float r, float g, float b, Glyph toDraw) {
+	record DrawEntry(float atX, float atY, float r, float g, float b, me.x150.renderer.font.Glyph toDraw) {
 	}
 }

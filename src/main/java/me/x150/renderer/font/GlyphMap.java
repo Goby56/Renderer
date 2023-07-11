@@ -20,12 +20,12 @@ class GlyphMap {
 	final char fromIncl, toExcl;
 	final Font[] font;
 	final Identifier bindToTexture;
-	private final Char2ObjectArrayMap<Glyph> glyphs = new Char2ObjectArrayMap<>();
+	private final Char2ObjectArrayMap<me.x150.renderer.font.Glyph> glyphs = new Char2ObjectArrayMap<>();
 	int width, height;
 
 	boolean generated = false;
 
-	public Glyph getGlyph(char c) {
+	public me.x150.renderer.font.Glyph getGlyph(char c) {
 		if (!generated) {
 			generate();
 		}
@@ -65,7 +65,7 @@ class GlyphMap {
 		int maxX = 0, maxY = 0;
 		int currentX = 0, currentY = 0;
 		int currentRowMaxY = 0;
-		List<Glyph> glyphs1 = new ArrayList<>();
+		List<me.x150.renderer.font.Glyph> glyphs1 = new ArrayList<>();
 		AffineTransform af = new AffineTransform();
 		FontRenderContext frc = new FontRenderContext(af, true, false);
 		while (generatedChars <= range) {
@@ -85,7 +85,7 @@ class GlyphMap {
 				currentRowMaxY = 0;
 			}
 			currentRowMaxY = Math.max(currentRowMaxY, height); // calculate the highest glyph in this row
-			glyphs1.add(new Glyph(currentX, currentY, width, height, currentChar, this));
+			glyphs1.add(new me.x150.renderer.font.Glyph(currentX, currentY, width, height, currentChar, this));
 			currentX += width + PADDING;
 			charNX++;
 		}
@@ -102,7 +102,7 @@ class GlyphMap {
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-		for (Glyph glyph : glyphs1) {
+		for (me.x150.renderer.font.Glyph glyph : glyphs1) {
 			g2d.setFont(getFontForGlyph(glyph.value()));
 			FontMetrics fontMetrics = g2d.getFontMetrics();
 			g2d.drawString(String.valueOf(glyph.value()), glyph.u(), glyph.v() + fontMetrics.getAscent());

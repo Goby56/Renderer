@@ -36,7 +36,7 @@ public class ClipStack {
 		Rectangle transformed = new Rectangle(x0, y0, x1, y1);
 		if (clipStack.empty()) {
 			clipStack.push(transformed);
-			Renderer2d.beginScissor(transformed.getX(), transformed.getY(), transformed.getX1(), transformed.getY1());
+			me.x150.renderer.render.Renderer2d.beginScissor(transformed.getX(), transformed.getY(), transformed.getX1(), transformed.getY1());
 		} else {
 			Rectangle lastClip = clipStack.peek();
 			double lx0 = lastClip.getX();
@@ -48,7 +48,7 @@ public class ClipStack {
 			double nx1 = MathHelper.clamp(transformed.getX1(), nx0, lx1);
 			double ny1 = MathHelper.clamp(transformed.getY1(), ny0, ly1);
 			clipStack.push(new Rectangle(nx0, ny0, nx1, ny1));
-			Renderer2d.beginScissor(nx0, ny0, nx1, ny1);
+			me.x150.renderer.render.Renderer2d.beginScissor(nx0, ny0, nx1, ny1);
 		}
 	}
 
@@ -73,10 +73,10 @@ public class ClipStack {
 	public static void popWindow() {
 		clipStack.pop();
 		if (clipStack.empty()) {
-			Renderer2d.endScissor();
+			me.x150.renderer.render.Renderer2d.endScissor();
 		} else {
 			Rectangle r = clipStack.peek();
-			Renderer2d.beginScissor(r.getX(), r.getY(), r.getX1(), r.getY1());
+			me.x150.renderer.render.Renderer2d.beginScissor(r.getX(), r.getY(), r.getX1(), r.getY1());
 		}
 	}
 
@@ -89,7 +89,7 @@ public class ClipStack {
 		if (clipStack.empty()) {
 			e.run();
 		} else {
-			Renderer2d.endScissor();
+			me.x150.renderer.render.Renderer2d.endScissor();
 			e.run();
 			Rectangle r = clipStack.peek();
 			Renderer2d.beginScissor(r.getX(), r.getY(), r.getX1(), r.getY1());

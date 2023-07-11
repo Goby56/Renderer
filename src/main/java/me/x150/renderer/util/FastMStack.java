@@ -28,10 +28,10 @@ public class FastMStack extends MatrixStack {
 		}
 	}
 
-	private final ObjectArrayList<Entry> fEntries = new ObjectArrayList<>(8);
-	private Entry top;
+	private final ObjectArrayList<me.x150.renderer.util.FastMStack.Entry> fEntries = new ObjectArrayList<>(8);
+	private me.x150.renderer.util.FastMStack.Entry top;
 	public FastMStack() {
-		fEntries.add(top = new Entry(new Matrix4f(), new Matrix3f()));
+		fEntries.add(top = new me.x150.renderer.util.FastMStack.Entry(new Matrix4f(), new Matrix3f()));
 	}
 
 	@Override
@@ -65,19 +65,13 @@ public class FastMStack extends MatrixStack {
 	}
 
 	@Override
-	public void multiply(Quaternionf quaternion, float originX, float originY, float originZ) {
-		top.positionMatrix.rotateAround(quaternion, originX, originY, originZ);
-		top.normalMatrix.rotate(quaternion);
-	}
-
-	@Override
 	public void multiplyPositionMatrix(Matrix4f matrix) {
 		top.positionMatrix.mul(matrix);
 	}
 
 	@Override
 	public void push() {
-		fEntries.add(top = new Entry(new Matrix4f(top.positionMatrix), new Matrix3f(top.normalMatrix)));
+		fEntries.add(top = new me.x150.renderer.util.FastMStack.Entry(new Matrix4f(top.positionMatrix), new Matrix3f(top.normalMatrix)));
 	}
 
 	@Override

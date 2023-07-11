@@ -126,7 +126,7 @@ public class Renderer2d {
 
 	/**
 	 * <p>Renders a filled ellipse</p>
-	 * <p>Best used inside of {@link MSAAFramebuffer#use(int, Runnable)}</p>
+	 * <p>Best used inside of {@link me.x150.renderer.render.MSAAFramebuffer#use(int, Runnable)}</p>
 	 *
 	 * @param matrices    The context MatrixStack
 	 * @param ellipseColor The color of the ellipse
@@ -161,7 +161,7 @@ public class Renderer2d {
 
 	/**
 	 * <p>Renders a filled circle</p>
-	 * <p>Best used inside of {@link MSAAFramebuffer#use(int, Runnable)}</p>
+	 * <p>Best used inside of {@link me.x150.renderer.render.MSAAFramebuffer#use(int, Runnable)}</p>
 	 *
 	 * @param matrices MatrixStack
 	 * @param circleColor Color of the circle

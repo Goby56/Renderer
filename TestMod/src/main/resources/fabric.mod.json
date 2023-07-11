@@ -1,15 +1,16 @@
 {
   "schemaVersion": 1,
-  "id": "test-mod",
+  "id": "testmod",
   "version": "${version}",
   "name": "TestMod",
   "description": "Test mod for the renderer library",
   "authors": [
-    "0x150"
+    "0x150",
+    "Goby56"
   ],
   "contact": {},
   "license": "All-Rights-Reserved",
-  "icon": "assets/TestMod/icon.png",
+  "icon": "assets/testmod/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
@@ -24,6 +25,6 @@
   ],
   "depends": {
     "fabricloader": "*",
-    "minecraft": "1.20.*"
+    "minecraft": "1.19.3"
   }
 }

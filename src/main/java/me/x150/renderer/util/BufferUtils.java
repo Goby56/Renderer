@@ -20,11 +20,10 @@ public class BufferUtils {
 	 * Creates a VBO for this buffer
 	 *
 	 * @param builder       The buffer
-	 * @param expectedUsage The expected usage of this vertex buffer. {@link VertexBuffer.Usage#STATIC} will upload this buffer to VRAM as soon as possible, whereas {@link VertexBuffer.Usage#DYNAMIC} will also keep it in local memory. Setting the correct flag is <b>only a suggestion to the GL driver</b>, nothing will happen if you use the wrong flag. The optimizations for this flag are minuscule.
 	 * @return The VBO
 	 */
-	public static VertexBuffer createVbo(BuiltBuffer builder, VertexBuffer.Usage expectedUsage) {
-		VertexBuffer buffer = new VertexBuffer(expectedUsage);
+	public static VertexBuffer createVbo(BuiltBuffer builder) {
+		VertexBuffer buffer = new VertexBuffer();
 		buffer.bind();
 		buffer.upload(builder);
 		VertexBuffer.unbind();
