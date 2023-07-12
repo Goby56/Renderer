@@ -3,7 +3,6 @@ package me.x150.testmod;
 import lombok.SneakyThrows;
 import me.x150.renderer.font.FontRenderer;
 import me.x150.renderer.objfile.ObjFile;
-import me.x150.renderer.render.OutlineFramebuffer;
 import me.x150.renderer.render.Renderer2d;
 import me.x150.renderer.render.Renderer3d;
 import me.x150.renderer.util.RendererUtils;
@@ -27,7 +26,6 @@ public class Handler {
 					ObjFile.ResourceProvider.ofPath(TestMod.getAssetsDir().resolve("models").resolve("custom").resolve("nuke")));
 		}
 		ob.draw(stack, new Matrix4f(), new Vec3d(0, 100, 0));
-		OutlineFramebuffer.useAndDraw(() -> Renderer3d.renderFilled(stack, Color.WHITE, new Vec3d(0, 300, 0), new Vec3d(5, 5, 5)), 1f, Color.GREEN, Color.BLACK);
 	}
 
 
