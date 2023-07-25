@@ -41,12 +41,12 @@ import java.util.function.Supplier;
  * This class uses {@link ObjReader} to read and parse .obj files. .mtl files are also handled by said library.
  * File access is managed by the {@link ResourceProvider} interface, which has the job of mapping a file name into a readable file.
  * <h2>Rendering</h2>
- * To render a loaded ObjFile, call {@link #draw(MatrixStack, Matrix4f, Vec3d)}.
+ * To render a loaded ObjFile, call {@link #draw(MatrixStack, Matrix4f, Vec3d, int)}.
  */
 public class ObjFile implements Closeable {
 	private final ResourceProvider provider;
 	private final String name;
-	final Map<Obj, VertexBuffer> buffers = new HashMap<>();
+	final List<Map<Obj, VertexBuffer>> buffers = new ArrayList<>();
 	final Map<String, Identifier> boundTextures = new HashMap<>();
 	Map<String, Obj> materialNameObjMap;
 	private List<Mtl> allMaterials;
@@ -99,60 +99,64 @@ public class ObjFile implements Closeable {
 	}
 
 	private void bake() {
-		BufferBuilder b = Tessellator.getInstance().getBuffer();
-		for (Map.Entry<String, Obj> stringObjEntry : materialNameObjMap.entrySet()) {
-			String materialName = stringObjEntry.getKey();
-			Obj objToDraw = stringObjEntry.getValue();
-			Mtl material = allMaterials.stream().filter(f -> f.getName().equals(materialName)).findFirst().orElse(null);
-			boolean hasTexture = material != null && material.getMapKd() != null;
-			if (hasTexture) {
-				String mapKd = material.getMapKd();
-				boundTextures.computeIfAbsent(mapKd, this::createTex0);
-			}
-			VertexFormat vmf;
-			if (material != null) {
-				vmf = hasTexture ? VertexFormats.POSITION_TEXTURE_COLOR_NORMAL : VertexFormats.POSITION_COLOR;
-			} else {
-				vmf = VertexFormats.POSITION;
-			}
-			b.begin(VertexFormat.DrawMode.TRIANGLES, vmf);
-			for (int i = 0; i < objToDraw.getNumFaces(); i++) {
-				ObjFace face = objToDraw.getFace(i);
-				boolean hasNormals = face.containsNormalIndices();
-				boolean hasUV = face.containsTexCoordIndices();
-				for (int i1 = 0; i1 < face.getNumVertices(); i1++) {
-					FloatTuple xyz = objToDraw.getVertex(face.getVertexIndex(i1));
-					VertexConsumer vertex = b.vertex(xyz.getX(), xyz.getY(), xyz.getZ());
-					if (vmf == VertexFormats.POSITION_TEXTURE_COLOR_NORMAL) {
-						if (!hasUV) {
-							throw new IllegalStateException(
-									"Diffuse texture present, vertex doesn't have UV coordinates. File corrupted?");
-						}
-						if (!hasNormals) {
-							throw new IllegalStateException(
-									"Diffuse texture present, vertex doesn't have normal coordinates. File corrupted?");
-						}
-						FloatTuple uvs = objToDraw.getTexCoord(face.getTexCoordIndex(i1));
-						vertex.texture(uvs.getX(), 1 - uvs.getY());
-					}
-					if (vmf == VertexFormats.POSITION_TEXTURE_COLOR_NORMAL || vmf == VertexFormats.POSITION_COLOR) {
-						Objects.requireNonNull(material);
-						FloatTuple kd = material.getKd();
-						if (kd != null) {
-							vertex.color(kd.getX(), kd.getY(), kd.getZ(), 1f);
-						} else {
-							vertex.color(1f, 1f, 1f, 1f);
-						}
-					}
-					if (vmf == VertexFormats.POSITION_TEXTURE_COLOR_NORMAL) {
-						FloatTuple normals = objToDraw.getNormal(face.getNormalIndex(i1));
-						vertex.normal(normals.getX(), normals.getY(), normals.getZ());
-					}
-					vertex.next();
+		for (int l = 0; l < 15; l++) {
+			buffers.add(l, new HashMap<>());
+			float light = (l + 1) / 16f;
+			BufferBuilder b = Tessellator.getInstance().getBuffer();
+			for (Map.Entry<String, Obj> stringObjEntry : materialNameObjMap.entrySet()) {
+				String materialName = stringObjEntry.getKey();
+				Obj objToDraw = stringObjEntry.getValue();
+				Mtl material = allMaterials.stream().filter(f -> f.getName().equals(materialName)).findFirst().orElse(null);
+				boolean hasTexture = material != null && material.getMapKd() != null;
+				if (hasTexture) {
+					String mapKd = material.getMapKd();
+					boundTextures.computeIfAbsent(mapKd, this::createTex0);
 				}
+				VertexFormat vmf;
+				if (material != null) {
+					vmf = hasTexture ? VertexFormats.POSITION_TEXTURE_COLOR_NORMAL : VertexFormats.POSITION_COLOR;
+				} else {
+					vmf = VertexFormats.POSITION;
+				}
+				b.begin(VertexFormat.DrawMode.TRIANGLES, vmf);
+				for (int i = 0; i < objToDraw.getNumFaces(); i++) {
+					ObjFace face = objToDraw.getFace(i);
+					boolean hasNormals = face.containsNormalIndices();
+					boolean hasUV = face.containsTexCoordIndices();
+					for (int i1 = 0; i1 < face.getNumVertices(); i1++) {
+						FloatTuple xyz = objToDraw.getVertex(face.getVertexIndex(i1));
+						VertexConsumer vertex = b.vertex(xyz.getX(), xyz.getY(), xyz.getZ());
+						if (vmf == VertexFormats.POSITION_TEXTURE_COLOR_NORMAL) {
+							if (!hasUV) {
+								throw new IllegalStateException(
+										"Diffuse texture present, vertex doesn't have UV coordinates. File corrupted?");
+							}
+							if (!hasNormals) {
+								throw new IllegalStateException(
+										"Diffuse texture present, vertex doesn't have normal coordinates. File corrupted?");
+							}
+							FloatTuple uvs = objToDraw.getTexCoord(face.getTexCoordIndex(i1));
+							vertex.texture(uvs.getX(), 1 - uvs.getY());
+						}
+						if (vmf == VertexFormats.POSITION_TEXTURE_COLOR_NORMAL || vmf == VertexFormats.POSITION_COLOR) {
+							Objects.requireNonNull(material);
+							FloatTuple kd = material.getKd();
+							if (kd != null) {
+								vertex.color(kd.getX() * light, kd.getY() * light, kd.getZ() * light, 1f);
+							} else {
+								vertex.color(light, light, light, 1f);
+							}
+						}
+						if (vmf == VertexFormats.POSITION_TEXTURE_COLOR_NORMAL) {
+							FloatTuple normals = objToDraw.getNormal(face.getNormalIndex(i1));
+							vertex.normal(normals.getX(), normals.getY(), normals.getZ());
+						}
+						vertex.next();
+					}
+				}
+				BufferBuilder.BuiltBuffer end = b.end();
+				buffers.get(l).put(objToDraw, BufferUtils.createVbo(end));
 			}
-			BufferBuilder.BuiltBuffer end = b.end();
-			buffers.put(objToDraw, BufferUtils.createVbo(end));
 		}
 		baked = true;
 	}
@@ -164,7 +168,10 @@ public class ObjFile implements Closeable {
 	 * @param viewMatrix View matrix to apply to this ObjFile, independent of any other matrix.
 	 * @param origin     Origin point to draw at
 	 */
-	public void draw(MatrixStack stack, Matrix4f viewMatrix, Vec3d origin) {
+	public void draw(MatrixStack stack, Matrix4f viewMatrix, Vec3d origin, int lightLevel) {
+		if (lightLevel == 0) {
+			lightLevel = 1;
+		}
 		if (closed) {
 			throw new IllegalStateException("Closed");
 		}
@@ -195,7 +202,7 @@ public class ObjFile implements Closeable {
 			} else {
 				shader = GameRenderer::getPositionProgram;
 			}
-			VertexBuffer vertexBuffer = buffers.get(obj);
+			VertexBuffer vertexBuffer = buffers.get(lightLevel - 1).get(obj);
 			vertexBuffer.bind();
 			vertexBuffer.draw(m4f, projectionMatrix, shader.get());
 		}
@@ -208,10 +215,14 @@ public class ObjFile implements Closeable {
 	 */
 	@Override
 	public void close() {
-		for (VertexBuffer buffer : buffers.values()) {
-			buffer.close();
+		for (int l = 0; l < 15; l++) {
+			for (VertexBuffer buffer : buffers.get(l).values()) {
+				buffer.close();
+			}
+			buffers.get(l).clear();
 		}
 		buffers.clear();
+
 		for (Identifier value : boundTextures.values()) {
 			MinecraftClient.getInstance().getTextureManager().destroyTexture(value);
 		}
