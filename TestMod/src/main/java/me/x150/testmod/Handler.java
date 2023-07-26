@@ -7,6 +7,7 @@ import me.x150.renderer.render.Renderer2d;
 import me.x150.renderer.render.Renderer3d;
 import me.x150.renderer.util.RendererUtils;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -25,8 +26,7 @@ public class Handler {
 			ob = new ObjFile("model.obj",
 					ObjFile.ResourceProvider.ofPath(TestMod.getAssetsDir().resolve("models").resolve("custom").resolve("nuke")));
 		}
-		int lightLevel = MinecraftClient.getInstance().world.getLightLevel(new BlockPos(0, 100, 0));
-		ob.draw(stack, new Matrix4f(), new Vec3d(0, 100, 0), lightLevel);
+		ob.draw(stack, new Matrix4f(), new Vec3d(0, 100, 0), WorldRenderer.getLightmapCoordinates(MinecraftClient.getInstance().world, new BlockPos(0, 100, 0)));
 //		OutlineFramebuffer.useAndDraw(() -> Renderer3d.renderFilled(stack, Color.WHITE, new Vec3d(0, 300, 0), new Vec3d(5, 5, 5)), 1f, Color.GREEN, Color.BLACK);
 	}
 
