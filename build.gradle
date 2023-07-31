@@ -73,6 +73,10 @@ repositories {
     }
 }
 
+loom {
+    accessWidenerPath = file("src/main/resources/renderer.accesswidener")
+}
+
 configurations {
     modImpl
     libImpl

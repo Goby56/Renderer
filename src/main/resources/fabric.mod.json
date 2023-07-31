@@ -13,6 +13,7 @@
   "license": "GPL-3.0",
   "icon": "assets/renderer/icon.png",
   "environment": "client",
+  "accessWidener": "renderer.accesswidener",
   "entrypoints": {
     "client": [
       "me.x150.renderer.client.RendererMain"
